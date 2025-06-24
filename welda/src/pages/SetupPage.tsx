@@ -17,7 +17,7 @@ const SetupPage = ({ onStart }: SetupPageProps) => {
       alert('최소값과 최대값을 입력하세요.');
       return;
     }
-    if (minValue <= 0 || maxValue <= 0) {
+    if (minValue <= -1 || maxValue <= 0) {
       alert('최소값과 최대값은 0보다 커야 합니다.');
       return;
     }
@@ -25,7 +25,7 @@ const SetupPage = ({ onStart }: SetupPageProps) => {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: 24  }}>
       <h2>줄자 설정</h2>
       <div>
         <label>최소값(cm): </label>
