@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Ruler2 from '../componets/Ruler2';
+import Ruler from '../componets/Ruler';
 import ReportPage from './reportPage';
 
 interface RulerPageProps {
@@ -36,7 +36,6 @@ const RulerPage = ({  rulerConfig, onBack, tickNumberHistory, setTickNumberHisto
   const [tickNumber, setTickNumber] = useState(rulerConfig.initial);
 
   const handleGetTickNumber = (tickNumber: number) => {
-    console.log('최종 ',tickNumber)
     setTickNumber(tickNumber) 
   }
 
@@ -68,7 +67,7 @@ const RulerPage = ({  rulerConfig, onBack, tickNumberHistory, setTickNumberHisto
       </div>
   
       <div>
-        <Ruler2 onChange={handleGetTickNumber} rulerConfig={rulerConfig} />
+        <Ruler onChange={handleGetTickNumber} rulerConfig={rulerConfig} />
       </div>
   
       <button 
