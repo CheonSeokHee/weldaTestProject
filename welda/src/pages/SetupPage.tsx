@@ -21,7 +21,12 @@ const SetupPage = ({ onStart }: SetupPageProps) => {
       alert('최소값과 최대값은 0보다 커야 합니다.');
       return;
     }
-    onStart({ min: minValue, max: maxValue, initial: initialValue });
+    if (initialValue < minValue || initialValue > maxValue) {
+      alert(`기본값은 최소값(${minValue}cm) 이상, 최대값(${maxValue}cm) 이하이어야 합니다.`);
+      return;
+    }
+
+   onStart({ min: minValue, max: maxValue, initial: initialValue });
   };
 
   return (
