@@ -7,13 +7,28 @@ interface Ruler2Props {
   onChange: (tickNumber: number) => void;
 }
 
-const Ruler2 = ({rulerConfig, onChange }: Ruler2Props) => {
+const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const unitSize = 10
 
     const [containerWidth, setContainerWidth] = useState(0);
 
-    useEffect(() => {
+   
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+
+        const scrollLeft = e.currentTarget.scrollLeft;
+        const clientSize = e.currentTarget.clientWidth;
+        const centerPosition = scrollLeft + clientSize / 2;
+        const currentTick = centerPosition / unitSize;
+        const calibratedTick = currentTick - clientSize /( unitSize * 2 ) ;
+    
+    
+            
+        onChange(parseFloat(calibratedTick.toFixed(1)));
+    };
+
+
+     useEffect(() => {
         function updateWidth() {
             if (scrollRef.current) {
                 setContainerWidth(scrollRef.current.clientWidth);
@@ -24,20 +39,7 @@ const Ruler2 = ({rulerConfig, onChange }: Ruler2Props) => {
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
 
-        const scrollLeft = e.currentTarget.scrollLeft;
-
-
-        const clientSize = e.currentTarget.clientWidth;
-        const centerPosition = scrollLeft + clientSize / 2;
-        const currentTick = centerPosition / unitSize;
-        const calibratedTick = currentTick - clientSize /( unitSize * 2 ) ;
-    
-    
-            
-        onChange(parseFloat(calibratedTick.toFixed(1)));
-    };
 
     // 초기 스크롤 위치도 containerWidth/2를 기준으로
     useEffect(() => {
@@ -87,7 +89,6 @@ const Ruler2 = ({rulerConfig, onChange }: Ruler2Props) => {
     display: 'flex',
   }}
 >
-  {/* 왼쪽 여백 */}
   <div style={{ width: `${containerWidth / 2}px`, height: '100%' }} />
 
 
@@ -136,8 +137,6 @@ const Ruler2 = ({rulerConfig, onChange }: Ruler2Props) => {
      
     );
   })}
-{/* </div> */}
-  {/* 오른쪽 여백 */}
   <div style={{ width: `${containerWidth / 2}px`, height: '100%' }} />
 </div>
         </div>
@@ -148,5 +147,5 @@ const Ruler2 = ({rulerConfig, onChange }: Ruler2Props) => {
   )
 }
 
-export default Ruler2
+export default Ruler
 

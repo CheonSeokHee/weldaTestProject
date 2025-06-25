@@ -11,7 +11,7 @@ interface ReportPageProps {
 
 const ReportPage: React.FC<ReportPageProps> = ({ tickNumberHistory }) => {
   const topFiveSorted = [...tickNumberHistory]
-    .sort((a, b) => b.value - a.value)
+   .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 5);
 
   if (topFiveSorted.length === 0) return null;
