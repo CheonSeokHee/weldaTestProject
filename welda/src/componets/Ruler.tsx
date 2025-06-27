@@ -9,22 +9,22 @@ interface Ruler2Props {
 
 const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
     const scrollRef = useRef<HTMLDivElement | null>(null);
-    const unitSize = 10
+    const unitSize = 10 // 10px = 0.1 단위
 
     const [containerWidth, setContainerWidth] = useState(0);
 
    
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-
         const scrollLeft = e.currentTarget.scrollLeft;
         const clientSize = e.currentTarget.clientWidth;
         const centerPosition = scrollLeft + clientSize / 2;
         const currentTick = centerPosition / unitSize;
         const calibratedTick = currentTick - clientSize /( unitSize * 2 ) ;
     
-    
-            
-        onChange(parseFloat(calibratedTick.toFixed(1)));
+        // 실제 값으로 변환 (min부터 시작, 0.1 단위)
+        // 10px = 0.1 단위이므로 10으로 나누어 0.1 단위로 변환
+        const actualValue = (calibratedTick / 10) + rulerConfig.min;
+        onChange(parseFloat(actualValue.toFixed(1)));
     };
 
 
@@ -44,12 +44,9 @@ const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
     // 초기 스크롤 위치도 containerWidth/2를 기준으로
     useEffect(() => {
         if (scrollRef.current && containerWidth > 0) {
-            // const gap =  (rulerConfig.max - rulerConfig.min)
-            // const initialOffset =  (rulerConfig.initial - rulerConfig.min) / gap + rulerConfig.min
-
-            scrollRef.current.scrollLeft =(rulerConfig.initial * 10);
-
-            
+            // handleScroll 함수의 계산 방식과 일치하도록 수정
+            const relativePosition = (rulerConfig.initial - rulerConfig.min) * 100;
+            scrollRef.current.scrollLeft = relativePosition;
         }
      
 
@@ -92,15 +89,16 @@ const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
   <div style={{ width: `${containerWidth / 2}px`, height: '100%' }} />
 
 
-  
-  {[...Array((rulerConfig.max - rulerConfig.min ) )].map((_, i) => {
-    const value = i / 10 + rulerConfig.min;
-    const isOneUnit = value % 1 === 0;
 
-    let height = '30%';
+
+  {[...Array(Math.floor((rulerConfig.max - rulerConfig.min) * 10))].map((_, i) => {
+    const value = rulerConfig.min + (i / 10);
+    const isOneUnit = value % 1 === 0; // 1 단위 눈금
+    const isLastUnit = value >= rulerConfig.max;
+
+    let height = '30%'; // 기본 0.1 단위 눈금
     
-    const isLastUint = i + 1 === rulerConfig.max - rulerConfig.min
-    if (isOneUnit || (i + 1 === rulerConfig.max - rulerConfig.min)) height = '70%';
+    if (isOneUnit || isLastUnit) height = '70%'; // 1 단위 눈금과 마지막 눈금
    
     return (            
       <div
@@ -109,20 +107,18 @@ const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
           width: '10px',
           height,
           borderLeft: '1px solid black',
-          ...(i + 1 === rulerConfig.max - rulerConfig.min && {borderRight: '1px solid black', borderLeft: 'none'}),
-          ...(i === (rulerConfig.max - rulerConfig.min)-2 && {borderRight: '1px solid black'}),
+          ...(isLastUnit && {borderRight: '1px solid black', borderLeft: 'none'}),
+          ...(i === Math.floor((rulerConfig.max - rulerConfig.min) * 10) - 1 && {borderRight: '1px solid black'}),
           boxSizing: 'border-box',
           position: 'relative',
-    
-
         }}
       >
-        {(isOneUnit || isLastUint) && (
+        {(isOneUnit || isLastUnit) && (
           <span
             style={{
               position: 'absolute',
               top: '100%',
-              ...(!isLastUint ? {left: '0'} : {left: '10px'}),
+              ...(!isLastUnit ? {left: '0'} : {left: '10px'}),
               transform: 'translateX(-50%)',
               fontSize: 12,
               color: '#333',
@@ -130,7 +126,7 @@ const Ruler = ({rulerConfig, onChange }: Ruler2Props) => {
               zIndex:1
             }}
           >
-            {isLastUint ? rulerConfig.max / 10 : value}  
+            {isLastUnit ? rulerConfig.max : Math.floor(value)}  
           </span>
         )}
       </div>
